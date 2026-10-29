@@ -1,0 +1,14 @@
+{
+  "name": "心动点单小铺",
+  "short_name": "点单小铺",
+  "description": "情侣点单小铺 · 给喜欢的人点一单温柔",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff7f9",
+  "theme_color": "#ff7aa2",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

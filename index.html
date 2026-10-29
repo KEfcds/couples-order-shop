@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#ff7aa2">
+<meta name="description" content="情侣点单小铺 · 给喜欢的人点一单温柔">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>心动点单小铺 💗</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff7aa2'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle'%3E💗%3C/text%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  color-scheme:light;
+  --pink:#ff7aa2; --deep:#e8497c; --bg1:#fff7f9; --bg2:#ffecf2;
+  --ink:#4a2b38; --sub:#b08a99; --card:#fff; --line:#ffdce7; --soft:#fff0f5;
+  --gold:#f59e0b; --green:#3fb883;
+  --shadow:0 12px 32px rgba(232,73,124,.14);
+}
+html,body{min-height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","MiSans","Microsoft YaHei",system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(640px 320px at 92% -60px,#ffe3ec 0%,transparent 60%),
+    radial-gradient(520px 280px at -80px 30%,#ffe9f1 0%,transparent 55%),
+    linear-gradient(180deg,var(--bg1),var(--bg2)) fixed;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:520px;margin:0 auto;padding:14px 14px 130px;position:relative}
+button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit}
+input,textarea,select{font-family:inherit;color:var(--ink)}
+textarea{resize:none}
+
+/* ===== 店铺门头 ===== */
+.head{position:relative;background:linear-gradient(135deg,#ff9db8,#ff7aa2 55%,#ff86b0);border-radius:26px;padding:22px 20px 18px;color:#fff;box-shadow:var(--shadow);overflow:hidden}
+.head::before,.head::after{content:'💗';position:absolute;opacity:.22;font-size:64px;pointer-events:none}
+.head::before{top:-14px;right:22px;transform:rotate(18deg)}
+.head::after{bottom:-24px;left:-8px;font-size:84px;transform:rotate(-14deg)}
+.shop-emoji{font-size:34px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.15))}
+.head h1{font-size:24px;letter-spacing:1px;margin:6px 0 4px;text-shadow:0 2px 6px rgba(0,0,0,.12)}
+.tagline{font-size:12.5px;opacity:.94}
+.chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:999px;font-size:12.5px;backdrop-filter:blur(4px)}
+.chip b{font-weight:700}
+.head-btns{position:absolute;top:14px;right:14px;display:flex;gap:8px;z-index:2}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);font-size:17px;display:grid;place-items:center;position:relative;transition:.15s}
+.icon-btn:active{transform:scale(.9)}
+.badge-dot{position:absolute;top:2px;right:2px;width:9px;height:9px;border-radius:50%;background:#ffe14d;border:2px solid #fff;display:none}
+
+/* ===== 新手提示 ===== */
+.tip{margin-top:10px;background:#fff;border:1.5px dashed var(--pink);border-radius:14px;padding:10px 12px;font-size:12.5px;color:#b25b78;display:flex;gap:8px;align-items:center;line-height:1.6}
+.tip button{margin-left:auto;color:var(--sub);font-size:15px;flex:none}
+
+/* ===== 分类页签 ===== */
+.tabs{position:sticky;top:8px;z-index:20;display:flex;gap:6px;margin:14px 0 12px;background:rgba(255,255,255,.78);backdrop-filter:blur(10px);border:1px solid #fff;border-radius:999px;padding:5px;box-shadow:0 6px 18px rgba(232,73,124,.10)}
+.tab{flex:1;padding:9px 4px;border-radius:999px;font-size:13.5px;color:var(--sub);transition:.18s;white-space:nowrap}
+.tab.on{background:linear-gradient(135deg,#ff8fae,var(--deep));color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(232,73,124,.35)}
+.sec{display:flex;align-items:baseline;gap:8px;margin:4px 4px 10px;color:var(--sub);font-size:12.5px}
+.sec h2{font-size:15px;color:var(--ink)}
+
+/* ===== 菜单卡片 ===== */
+.menu{display:grid;gap:10px}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:20px;padding:12px;border:1.5px solid transparent;box-shadow:0 4px 14px rgba(232,73,124,.07);transition:.15s;cursor:pointer}
+.item:active{transform:scale(.985)}
+.item.in{border-color:var(--pink);background:linear-gradient(0deg,#fff0f5,#fff)}
+.emoji{position:relative;width:52px;height:52px;flex:none;border-radius:16px;background:var(--soft);display:grid;place-items:center;font-size:28px}
+.qty-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--deep);color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center;border:2px solid #fff}
+.item .info{flex:1;min-width:0}
+.item h3{font-size:15px}
+.item p{font-size:12px;color:var(--sub);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.price{font-size:13px;font-weight:800;color:var(--deep)}
+.add{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,#ff9db8,var(--deep));color:#fff;font-size:19px;display:grid;place-items:center;box-shadow:0 4px 10px rgba(232,73,124,.35);transition:.15s;line-height:1}
+.add:active{transform:scale(.86)}
+.empty{text-align:center;color:var(--sub);font-size:13px;padding:44px 0;background:#fff;border:1.5px dashed var(--line);border-radius:20px;line-height:2}
+.empty .e{font-size:34px}
+
+/* ===== 底部购物栏 ===== */
+.cartbar{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140px);width:min(492px,calc(100% - 24px));z-index:30;display:flex;align-items:center;gap:12px;background:#fff;border-radius:999px;padding:8px 8px 8px 18px;box-shadow:0 14px 34px rgba(232,73,124,.28);transition:transform .3s cubic-bezier(.2,.9,.3,1.2)}
+.cartbar.show{transform:translate(-50%,0)}
+.cartbar .sum{flex:1;font-size:13.5px;font-weight:700;min-width:0}
+.cartbar .sum small{display:block;font-weight:400;color:var(--sub);font-size:11px;margin-top:1px}
+.go{background:linear-gradient(135deg,#ff8fae,var(--deep));color:#fff;border-radius:999px;padding:12px 22px;font-weight:800;font-size:14.5px;box-shadow:0 6px 14px rgba(232,73,124,.4);flex:none}
+.go:active{transform:scale(.95)}
+
+/* ===== 抽屉面板 ===== */
+.mask{position:fixed;inset:0;background:rgba(74,43,56,.4);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+.mask.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:min(520px,100%);max-height:88vh;overflow:auto;background:var(--bg1);border-radius:26px 26px 0 0;z-index:50;transition:transform .32s cubic-bezier(.2,.9,.25,1);padding-bottom:env(safe-area-inset-bottom);overscroll-behavior:contain}
+.sheet.show{transform:translate(-50%,0)}
+.sheet-head{position:sticky;top:0;background:linear-gradient(180deg,var(--bg1) 78%,transparent);padding:16px 18px 12px;display:flex;align-items:center;gap:10px;z-index:2}
+.sheet-head h2{font-size:17px}
+.sheet-head .x{margin-left:auto;width:32px;height:32px;border-radius:50%;background:#ffe3ec;color:var(--deep);font-size:14px;display:grid;place-items:center;flex:none}
+.sheet-body{padding:4px 18px 28px}
+
+/* ===== 通用按钮/表单 ===== */
+.btn{border-radius:14px;padding:11px 16px;font-size:14px;font-weight:700;transition:.15s}
+.btn.pri{background:linear-gradient(135deg,#ff8fae,var(--deep));color:#fff;box-shadow:0 6px 16px rgba(232,73,124,.35)}
+.btn.ghost{background:#ffe3ec;color:var(--deep)}
+.btn.gray{background:#f1e3e8;color:#a97f90}
+.btn:active{transform:scale(.96)}
+.btn.block{width:100%}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;color:var(--sub);margin-bottom:6px}
+.field input[type=text],.field input[type=number],.field textarea,.field input:not([type]){width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;background:#fff;outline:none;transition:.15s}
+.field input:focus,.field textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,122,162,.15)}
+.hint{font-size:11px;color:#c49aa9;margin-top:6px;line-height:1.7}
+.card-box{background:#fff;border-radius:18px;padding:14px;margin-bottom:14px;border:1px solid #ffe4ee}
+.card-box h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.switch{position:relative;width:46px;height:26px;flex:none;display:inline-block}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#f0cdd9;border-radius:999px;transition:.2s;cursor:pointer}
+.slider::before{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 2px 5px rgba(0,0,0,.15)}
+.switch input:checked+.slider{background:var(--pink)}
+.switch input:checked+.slider::before{transform:translateX(20px)}
+
+/* ===== 购物篮行 ===== */
+.crow{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:10px 12px;margin-bottom:8px;border:1px solid #ffe4ee}
+.crow .ce{font-size:24px;flex:none}
+.crow .ci{flex:1;min-width:0}
+.crow .ci b{font-size:14px;display:block}
+.crow .ci span{font-size:11.5px;color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.step{display:flex;align-items:center;gap:2px;background:var(--soft);border-radius:999px;padding:3px;flex:none}
+.step button{width:26px;height:26px;border-radius:50%;background:#fff;color:var(--deep);font-weight:800;font-size:15px;box-shadow:0 2px 6px rgba(232,73,124,.18);line-height:1}
+.step b{min-width:22px;text-align:center;font-size:13px}
+.crow .lp{font-size:12.5px;font-weight:700;color:var(--deep);width:48px;text-align:right;flex:none}
+.chips-line{display:flex;gap:8px;flex-wrap:wrap}
+.echip{padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:13px;transition:.15s}
+.echip.on{background:linear-gradient(135deg,#ffd3e1,#ffc0d4);border-color:var(--pink);color:var(--deep);font-weight:700}
+.cart-total-row{display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:12px 4px 0;font-size:14px;color:var(--sub)}
+.cart-total-row b{font-size:20px;color:var(--deep)}
+
+/* ===== 订单小票 ===== */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;border:1px solid #ffe4ee}
+.stat b{display:block;font-size:19px;color:var(--deep)}
+.stat span{font-size:11px;color:var(--sub)}
+.receipt{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid #ffe4ee;box-shadow:0 4px 14px rgba(232,73,124,.07)}
+.receipt .rh{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.receipt .no{font-size:12.5px;font-weight:800;color:var(--deep)}
+.receipt .time{font-size:11px;color:var(--sub);margin-left:auto}
+.status{font-size:11px;padding:3px 9px;border-radius:999px;font-weight:700}
+.st-pending{background:#fff3d6;color:#c07c10;animation:pulse 1.6s infinite}
+.st-accepted{background:#ddf6ea;color:#1f8f63}
+.st-done{background:#ffe0eb;color:var(--deep)}
+.st-declined{background:#eee6ea;color:#a3909a}
+@keyframes pulse{50%{opacity:.55}}
+.rline{display:flex;font-size:13px;padding:3px 0;color:#6d4553}
+.rline .rname{flex:1;min-width:0}
+.rline .rqty{color:var(--sub);margin:0 8px;flex:none}
+.rtotal{display:flex;justify-content:flex-end;font-size:13.5px;font-weight:800;color:var(--deep);padding:8px 0 2px;border-top:1.5px dashed var(--line);margin-top:6px}
+.rnote{font-size:12px;color:#b3768d;background:var(--soft);border-radius:10px;padding:7px 10px;margin-top:8px;line-height:1.6}
+.racts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.racts .btn{padding:8px 13px;font-size:12.5px;border-radius:11px}
+.sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sub);background:#fff;border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.sdot{width:8px;height:8px;border-radius:50%;background:#ccc;flex:none}
+.sdot.on{background:var(--green);box-shadow:0 0 0 3px rgba(63,184,131,.2)}
+.sdot.retry{background:var(--gold)}
+
+/* ===== 菜单编辑器 ===== */
+.mgroup{margin:12px 0 6px;font-size:13px;font-weight:700;color:var(--deep)}
+.mrow{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.mrow input{border:1.5px solid var(--line);border-radius:10px;padding:8px;font-size:13px;background:#fff;min-width:0;outline:none}
+.mrow input:focus{border-color:var(--pink)}
+.mrow .e{width:46px;text-align:center;flex:none}
+.mrow .n{flex:1.2}
+.mrow .p{width:58px;flex:none;text-align:center}
+.mrow .p::-webkit-outer-spin-button,.mrow .p::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.mrow .del{width:30px;height:34px;flex:none;color:#e089a4;font-size:15px}
+
+/* ===== 下单成功弹窗 ===== */
+.ok-mask{position:fixed;inset:0;background:rgba(74,43,56,.5);z-index:80;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.25s;padding:20px}
+.ok-mask.show{opacity:1;pointer-events:auto}
+.ok-card{width:min(340px,100%);max-height:86vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;transform:scale(.8);transition:.3s cubic-bezier(.2,.9,.3,1.3);text-align:center}
+.ok-mask.show .ok-card{transform:scale(1)}
+.ok-card .big{font-size:40px}
+.ok-card h2{margin:6px 0 2px;font-size:19px}
+.ok-sub{font-size:12px;color:var(--sub)}
+.ok-receipt{margin:14px 0;padding:12px 12px 8px;border:1.5px dashed var(--line);border-radius:14px;text-align:left}
+.ok-no{font-size:11px;color:var(--sub);letter-spacing:.5px;margin-bottom:6px}
+.ok-btns{display:flex;gap:10px}
+.ok-btns .btn{flex:1}
+
+/* ===== 动效 ===== */
+.fx-heart{position:fixed;z-index:100;pointer-events:none;animation:fly var(--dur) ease-out forwards;font-size:var(--fs);left:var(--x);top:var(--y)}
+@keyframes fly{
+  0%{transform:translate(0,0) scale(.6) rotate(0);opacity:0}
+  12%{opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(1.15) rotate(var(--rot));opacity:0}
+}
+#toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,20px);background:rgba(74,43,56,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;z-index:120;opacity:0;pointer-events:none;transition:.25s;max-width:86%;text-align:center;line-height:1.5}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.foot{text-align:center;color:#c8a3b1;font-size:11px;margin-top:26px;line-height:1.9}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="head">
+    <div class="shop-emoji">💌</div>
+    <h1 id="shopNameEl">心动点单小铺</h1>
+    <p class="tagline" id="taglineEl">本店只接待一位特别的客人</p>
+    <div class="chips">
+      <span class="chip">店主·<b id="ownerEl">宝贝老板</b></span>
+      <span class="chip">客人·<b id="customerEl">小甜心</b></span>
+      <span class="chip" id="todayEl"></span>
+    </div>
+    <div class="head-btns">
+      <button class="icon-btn" id="ordersBtn" title="订单看板" aria-label="订单看板">🧾<span class="badge-dot" id="pendingDot"></span></button>
+      <button class="icon-btn" id="settingsBtn" title="店铺设置" aria-label="店铺设置">⚙️</button>
+    </div>
+  </header>
+
+  <div class="tip" id="tip">💡 第一次玩？点右上角 <b>⚙️</b> 改店主名字、编辑菜单、开启双人实时同步～<button id="tipClose" aria-label="关闭提示">✕</button></div>
+
+  <nav class="tabs" id="tabs" aria-label="菜单分类"></nav>
+  <div class="sec"><h2 id="secTitle">今日菜单</h2><span id="secCount"></span></div>
+  <main class="menu" id="menu"></main>
+
+  <p class="foot">Made with 💗 · 单文件网页 · 数据只存在你的设备上<br>愿每一单都被温柔接住</p>
+</div>
+
+<div class="cartbar" id="cartbar">
+  <div class="sum"><span id="cartSumText"></span><small id="cartSumTotal"></small></div>
+  <button class="go" id="goBtn">去下单 →</button>
+</div>
+
+<div class="mask" id="mask"></div>
+
+<section class="sheet" id="cartSheet" role="dialog" aria-label="确认订单">
+  <div class="sheet-head"><h2>🧺 确认我的订单</h2><button class="x" data-close aria-label="关闭">✕</button></div>
+  <div class="sheet-body">
+    <div id="cartRows"></div>
+    <div class="field" style="margin-top:14px"><label>📝 给店主留言（备注）</label><textarea id="noteInput" rows="2" maxlength="100" placeholder="例如：少糖 / 今晚就要 / 抱抱要加时…"></textarea></div>
+    <div class="field"><label>⏰ 期望时间</label><div class="chips-line" id="expectChips"></div></div>
+    <div class="cart-total-row"><span>合计</span><b id="cartTotal">0💗</b></div>
+    <button class="btn pri block" id="submitBtn" style="margin-top:12px;padding:14px;font-size:15.5px">提交订单 💗</button>
+    <p class="hint" style="text-align:center">提交后店主会收到通知，记得等 TA 接单哦～</p>
+  </div>
+</section>
+
+<section class="sheet" id="ordersSheet" role="dialog" aria-label="订单看板">
+  <div class="sheet-head"><h2>🧾 订单看板</h2><span class="sync-pill"><span class="sdot" id="syncDot"></span><span id="syncText">单机模式</span></span><button class="x" data-close aria-label="关闭">✕</button></div>
+  <div class="sheet-body">
+    <div class="stats">
+      <div class="stat"><b id="statOrders">0</b><span>累计订单</span></div>
+      <div class="stat"><b id="statIncome">0💗</b><span>收到心意</span></div>
+      <div class="stat"><b id="statPending">0</b><span>待接单</span></div>
+    </div>
+    <div id="ordersList"></div>
+  </div>
+</section>
+
+<section class="sheet" id="settingsSheet" role="dialog" aria-label="店铺设置">
+  <div class="sheet-head"><h2>⚙️ 店铺设置</h2><button class="x" data-close aria-label="关闭">✕</button></div>
+  <div class="sheet-body" id="settingsBody"></div>
+</section>
+
+<div class="ok-mask" id="okMask">
+  <div class="ok-card">
+    <div class="big">🎉</div>
+    <h2>下单成功！</h2>
+    <p class="ok-sub">订单已送至店主，等 TA 接单吧～</p>
+    <div class="ok-receipt" id="okReceipt"></div>
+    <div class="ok-btns"><button class="btn ghost" id="okOrders">🧾 查看订单</button><button class="btn pri" id="okMore">继续逛逛</button></div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* ================= 小工具 ================= */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const str = (v, fb) => String(v ?? (fb ?? '')).trim();
+const clampInt = (v, lo, hi) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : lo; };
+const pad2 = n => String(n).padStart(2, '0');
+const fmtTime = ts => { const d = new Date(ts); return `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+const fmtNo = ts => { const d = new Date(ts); return `NO.${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}-${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`; };
+
+/* ================= 默认数据（想改默认菜单就编辑这里） ================= */
+const CATS = [
+  { key: 'food',    emoji: '🍜', tab: '吃什么',   title: '想一起吃什么' },
+  { key: 'service', emoji: '🎀', tab: '陪你做',   title: '想让 TA 陪你做什么' },
+  { key: 'place',   emoji: '🎡', tab: '去哪玩',   title: '想去哪里玩' },
+];
+const EXPECTS = ['⚡ 现在就要', '🌙 今晚', '📅 这周末', '🔮 随缘'];
+const mi = (emoji, name, desc, price, id) => ({ id, emoji, name, desc, price });
+const DEFAULT_SETTINGS = {
+  shopName: '心动点单小铺',
+  ownerName: '宝贝老板',          // 店主名字，设置里随时可改
+  customerName: '小甜心',
+  tagline: '本店只接待一位特别的客人',
+  menu: {
+    food: [
+      mi('🧋','手作奶茶','全糖去冰，芋泥波波',2,'f1'),
+      mi('🍜','深夜泡面','加蛋加肠，老板亲自煮',1,'f2'),
+      mi('🍲','火锅一顿','毛肚鸭肠都归我',10,'f3'),
+      mi('🍰','下午茶甜品','蛋糕和阳光都要有',3,'f4'),
+      mi('🍣','寿司日料','三文鱼我全包啦',5,'f5'),
+      mi('🍦','路边冰淇淋','散步限定小确幸',1,'f6'),
+      mi('🍕','披萨之夜','拉丝那块给我留着',4,'f7'),
+      mi('🥟','饺子大餐','你擀皮来我调馅',2,'f8'),
+    ],
+    service: [
+      mi('🤗','用力抱抱10秒','不许先松手',1,'s1'),
+      mi('💆','捏肩5分钟','力度可以，态度端正',2,'s2'),
+      mi('🎮','陪你打一局','输了也不许甩锅',3,'s3'),
+      mi('😴','睡前哄睡服务','讲故事讲到睡着',2,'s4'),
+      mi('🎬','陪看电影','我看你，你看片',3,'s5'),
+      mi('🙈','无条件道歉券','这一次请先低头',5,'s6'),
+      mi('📸','专属摄影师','把 TA 拍成九宫格',2,'s7'),
+      mi('🐸','学小动物叫','叫声自选，不许笑',3,'s8'),
+    ],
+    place: [
+      mi('🎡','游乐园一日','摩天轮压轴登场',10,'p1'),
+      mi('🌊','一起去看海','浪漫周期不限时',10,'p2'),
+      mi('⛺','露营野餐','你负责搭我负责吃',5,'p3'),
+      mi('🌃','夜市散步','从头一路吃到尾',1,'p4'),
+      mi('🛍️','逛街拎包','全程不喊累那种',2,'p5'),
+      mi('🏞️','周边短途游','说走就走小旅行',6,'p6'),
+      mi('🌇','看日落专车','自行车后座限定',3,'p7'),
+      mi('🏠','宅家一整天','什么都不干的那种',1,'p8'),
+    ],
+  },
+  push: { ntfy: { enabled: false, server: 'https://ntfy.sh', topic: '' }, bark: '', serverchan: '', hook: '' },
+};
+const STATUS = {
+  pending:  { t: '待接单', cls: 'st-pending' },
+  accepted: { t: '已接单', cls: 'st-accepted' },
+  done:     { t: '已完成', cls: 'st-done' },
+  declined: { t: '已婉拒', cls: 'st-declined' },
+};
+
+/* ================= 本地存储 ================= */
+const LS = { settings: 'cshop:settings:v1', orders: 'cshop:orders:v1', cart: 'cshop:cart:v1', tip: 'cshop:tip' };
+function loadJSON(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+function mergeSettings(s) {
+  const d = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  if (!s || typeof s !== 'object') return d;
+  d.shopName = str(s.shopName).slice(0, 30) || d.shopName;
+  d.ownerName = str(s.ownerName).slice(0, 20) || d.ownerName;
+  d.customerName = str(s.customerName).slice(0, 20) || d.customerName;
+  d.tagline = str(s.tagline).slice(0, 40);
+  ['food', 'service', 'place'].forEach(k => {
+    if (Array.isArray(s.menu && s.menu[k])) {
+      d.menu[k] = s.menu[k].filter(it => it && str(it.name)).map(it => ({
+        id: str(it.id).slice(0, 40) || uid(),
+        emoji: str(it.emoji).slice(0, 8) || '💗',
+        name: str(it.name).slice(0, 20),
+        desc: str(it.desc).slice(0, 40),
+        price: clampInt(it.price, 0, 999),
+      }));
+    }
+  });
+  if (s.push && typeof s.push === 'object') {
+    if (s.push.ntfy && typeof s.push.ntfy === 'object') {
+      d.push.ntfy.enabled = !!s.push.ntfy.enabled;
+      d.push.ntfy.server = str(s.push.ntfy.server).slice(0, 200) || d.push.ntfy.server;
+      d.push.ntfy.topic = str(s.push.ntfy.topic).slice(0, 64);
+    }
+    d.push.bark = str(s.push.bark).slice(0, 200);
+    d.push.serverchan = str(s.push.serverchan).slice(0, 200);
+    d.push.hook = str(s.push.hook).slice(0, 500);
+  }
+  return d;
+}
+
+/* ================= 状态 ================= */
+let settings = mergeSettings(loadJSON(LS.settings, null));
+let orders = loadJSON(LS.orders, []);
+if (!Array.isArray(orders)) orders = [];
+let cart = loadJSON(LS.cart, null) || { qty: {}, note: '', expect: EXPECTS[0] };
+if (!cart.qty) cart.qty = {};
+let activeCat = 'food';
+let draft = null;
+let es = null;
+
+// 支持 ?shop=xxx&owner=xxx&customer=xxx 快速换名字（会保存下来）
+(function applyUrlOverrides() {
+  try {
+    const q = new URLSearchParams(location.search);
+    const map = { shop: 'shopName', owner: 'ownerName', customer: 'customerName', tagline: 'tagline' };
+    let dirty = false;
+    for (const [p, k] of Object.entries(map)) {
+      const v = q.get(p);
+      if (v) { settings[k] = str(v).slice(0, 30); dirty = true; }
+    }
+    if (dirty) saveJSON(LS.settings, settings);
+  } catch (e) {}
+})();
+
+const saveCart = () => saveJSON(LS.cart, cart);
+function saveOrders() { if (orders.length > 200) orders = orders.slice(0, 200); saveJSON(LS.orders, orders); }
+
+const catOf = key => CATS.find(c => c.key === key);
+function itemIn(s, id) { for (const c of CATS) { const it = (s.menu[c.key] || []).find(i => i.id === id); if (it) return it; } return null; }
+const findItem = id => itemIn(settings, id);
+
+/* ================= 安全校验：出站请求只允许公网 http/https ================= */
+function assertSafeUrl(u) {
+  try {
+    const url = new URL(u);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return '只支持 http/https 链接';
+    const h = (url.hostname || '').toLowerCase().replace(/\.$/, '');
+    if (!h) return '链接缺少主机名';
+    if (h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.local') || h.endsWith('.internal') || h === '0.0.0.0') return '不允许本机/内网地址';
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(h)) return isReservedIPv4(h) ? '不允许内网/保留 IP 地址' : null;
+    if (h.startsWith('[') && h.endsWith(']')) return isReservedIPv6(h.slice(1, -1)) ? '不允许内网/保留 IP 地址' : null;
+    return null;
+  } catch (e) { return '链接格式不正确'; }
+}
+function isReservedIPv4(ip) {
+  const p = ip.split('.').map(Number);
+  if (p.some(n => n > 255)) return true;
+  const [a, b] = p;
+  return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || (a === 192 && b === 0) ||
+    (a === 198 && (b === 18 || b === 19)) || (a === 198 && b === 51 && p[2] === 100) ||
+    (a === 203 && b === 0 && p[2] === 113) || a >= 224;
+}
+function isReservedIPv6(ip) {
+  const s = ip.toLowerCase();
+  if (s === '::' || s === '::1') return true;
+  if (/^(f[cd]|fe[89ab]|ff)/.test(s)) return true;
+  if (s.startsWith('2001:db8')) return true;
+  const m = s.match(/::ffff:(\d{1,3}(?:\.\d{1,3}){3})/);
+  if (m) return isReservedIPv4(m[1]);
+  return false;
+}
+
+/* ================= 音效 & 小动效 ================= */
+let AC = null;
+function ac() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (AC && AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function ding(freq = 760, vol = .12, dur = .3) {
+  const c = ac(); if (!c) return;
+  try {
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.0001, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(vol, c.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, c.currentTime + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + dur + .05);
+  } catch (e) {}
+}
+function melody() { ding(660, .1, .18); setTimeout(() => ding(880, .1, .18), 120); setTimeout(() => ding(1175, .12, .32), 240); }
+function burstAt(x, y, n = 16) {
+  const chars = ['💗', '💕', '💖', '✨', '💘', '🩷'];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'fx-heart';
+    s.textContent = chars[Math.floor(Math.random() * chars.length)];
+    s.style.setProperty('--x', x + 'px');
+    s.style.setProperty('--y', y + 'px');
+    s.style.setProperty('--dx', ((Math.random() - .5) * 220) + 'px');
+    s.style.setProperty('--dy', (-(120 + Math.random() * 170)) + 'px');
+    s.style.setProperty('--rot', (Math.random() * 120 - 60) + 'deg');
+    s.style.setProperty('--dur', (900 + Math.random() * 700) + 'ms');
+    s.style.setProperty('--fs', (13 + Math.random() * 17) + 'px');
+    document.body.appendChild(s);
+    s.addEventListener('animationend', () => s.remove());
+  }
+}
+const burstCenter = () => burstAt(innerWidth / 2, innerHeight * .38, 22);
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ================= 渲染：门头 / 页签 / 菜单 ================= */
+function renderHead() {
+  $('#shopNameEl').textContent = settings.shopName;
+  document.title = settings.shopName + ' 💗';
+  $('#taglineEl').textContent = settings.tagline;
+  $('#ownerEl').textContent = settings.ownerName;
+  $('#customerEl').textContent = settings.customerName;
+  const d = new Date();
+  $('#todayEl').textContent = `${d.getMonth() + 1}月${d.getDate()}日 · 星期${'日一二三四五六'[d.getDay()]}`;
+}
+function renderTabs() {
+  $('#tabs').innerHTML = CATS.map(c =>
+    `<button class="tab ${c.key === activeCat ? 'on' : ''}" data-cat="${c.key}">${c.emoji} ${esc(c.tab)}</button>`).join('');
+}
+function renderMenu() {
+  const c = catOf(activeCat);
+  const list = settings.menu[activeCat] || [];
+  $('#secTitle').textContent = c.title;
+  $('#secCount').textContent = list.length ? `${list.length} 件在售` : '';
+  $('#menu').innerHTML = list.length ? list.map(it => {
+    const n = cart.qty[it.id] || 0;
+    return `<article class="item ${n ? 'in' : ''}" data-id="${esc(it.id)}">
+      <div class="emoji">${esc(it.emoji)}${n ? `<span class="qty-badge">${n}</span>` : ''}</div>
+      <div class="info"><h3>${esc(it.name)}</h3><p>${esc(it.desc) || '&nbsp;'}</p></div>
+      <div class="side"><span class="price">${it.price}💗</span><button class="add" data-add="${esc(it.id)}" aria-label="加入订单">＋</button></div>
+    </article>`;
+  }).join('') : `<div class="empty"><div class="e">🫧</div>老板还没上架新品<br>去 ⚙️ 设置里添加吧～</div>`;
+}
+
+/* ================= 购物车 ================= */
+const cartEntries = () => Object.entries(cart.qty).map(([id, n]) => ({ it: findItem(id), n })).filter(e => e.it && e.n > 0);
+const cartTotal = () => cartEntries().reduce((s, e) => s + e.it.price * e.n, 0);
+const cartCount = () => cartEntries().reduce((s, e) => s + e.n, 0);
+function addToCart(id, x, y) {
+  const it = findItem(id); if (!it) return;
+  cart.qty[id] = (cart.qty[id] || 0) + 1;
+  saveCart(); renderCartUI(); ding(760, .08, .15);
+  if (x != null) burstAt(x, y, 5);
+}
+function removeFromCart(id) {
+  if (!cart.qty[id]) return;
+  cart.qty[id]--; if (cart.qty[id] <= 0) delete cart.qty[id];
+  saveCart(); renderCartUI();
+}
+function renderCartUI() {
+  renderMenu();
+  const n = cartCount(), t = cartTotal();
+  $('#cartbar').classList.toggle('show', n > 0);
+  $('#cartSumText').textContent = `🛍️ 已选 ${n} 件`;
+  $('#cartSumTotal').textContent = `合计 ${t}💗 · 店主接单后生效哦`;
+  if ($('#cartSheet').classList.contains('show')) renderCartRows();
+}
+function renderCartRows() {
+  const es2 = cartEntries();
+  $('#cartRows').innerHTML = es2.length ? es2.map(({ it, n }) => `
+    <div class="crow"><span class="ce">${esc(it.emoji)}</span>
+      <div class="ci"><b>${esc(it.name)}</b><span>${esc(it.desc) || '店长推荐'}</span></div>
+      <div class="step"><button data-dec="${esc(it.id)}" aria-label="减少">−</button><b>${n}</b><button data-inc="${esc(it.id)}" aria-label="增加">＋</button></div>
+      <span class="lp">${it.price * n}💗</span></div>`).join('')
+    : `<div class="empty"><div class="e">🧺</div>购物篮空空如也<br>去菜单里挑点心动吧～</div>`;
+  $('#cartTotal').textContent = cartTotal() + '💗';
+  $('#noteInput').value = cart.note || '';
+  renderExpectChips();
+}
+function renderExpectChips() {
+  $('#expectChips').innerHTML = EXPECTS.map(e =>
+    `<button class="echip ${e === cart.expect ? 'on' : ''}" data-expect="${esc(e)}">${esc(e)}</button>`).join('');
+}
+
+/* ================= 抽屉开关 ================= */
+function openSheet(el) { el.classList.add('show'); $('#mask').classList.add('show'); document.body.style.overflow = 'hidden'; }
+function closeSheets() { $$('.sheet').forEach(s => s.classList.remove('show')); $('#mask').classList.remove('show'); document.body.style.overflow = ''; }
+
+/* ================= 订单 ================= */
+function orderSummaryText(o) {
+  const lines = o.items.map(e => `${e.emoji} ${e.name} ×${e.n}（${e.price * e.n}💗）`).join('\n');
+  return `【${settings.shopName}】新订单\n客人：${o.from}\n${lines}\n合计：${o.total}💗\n期望：${o.expect}${o.note ? `\n备注：${o.note}` : ''}`;
+}
+function sanitizeOrder(o) {
+  if (!o || typeof o !== 'object') return null;
+  const items = Array.isArray(o.items)
+    ? o.items.map(e => ({ id: str(e.id).slice(0, 40), emoji: str(e.emoji).slice(0, 8), name: str(e.name).slice(0, 20), price: clampInt(e.price, 0, 9999), n: clampInt(e.n, 1, 99) })).filter(e => e.name)
+    : null;
+  if (!items || !items.length) return null;
+  return {
+    id: str(o.id).slice(0, 40) || uid(),
+    no: str(o.no).slice(0, 32) || fmtNo(Date.now()),
+    ts: Number(o.ts) || Date.now(),
+    from: str(o.from).slice(0, 20) || '神秘客人',
+    items,
+    total: clampInt(o.total, 0, 99999),
+    note: str(o.note).slice(0, 100),
+    expect: str(o.expect).slice(0, 16),
+    status: STATUS[o.status] ? o.status : 'pending',
+    statusTs: Number(o.statusTs) || 0,
+  };
+}
+function renderOrders() {
+  const pend = orders.filter(o => o.status === 'pending').length;
+  $('#statOrders').textContent = orders.length;
+  $('#statIncome').textContent = orders.filter(o => o.status !== 'declined').reduce((s, o) => s + o.total, 0) + '💗';
+  $('#statPending').textContent = pend;
+  $('#pendingDot').style.display = pend > 0 ? 'block' : 'none';
+  const list = $('#ordersList');
+  if (!orders.length) {
+    list.innerHTML = `<div class="empty"><div class="e">📖</div>账本还是空的<br>快去点第一单吧～</div>`;
+    return;
+  }
+  list.innerHTML = orders.map(o => {
+    const st = STATUS[o.status] || STATUS.pending;
+    const acts = o.status === 'pending'
+      ? `<button class="btn pri" data-act="accept" data-id="${esc(o.id)}">🙌 接单</button><button class="btn gray" data-act="decline" data-id="${esc(o.id)}">🙈 婉拒</button>`
+      : o.status === 'accepted'
+        ? `<button class="btn pri" data-act="done" data-id="${esc(o.id)}">🎉 完成这单</button>`
+        : `<button class="btn gray" data-act="del" data-id="${esc(o.id)}">🗑 删除</button>`;
+    return `<div class="receipt">
+      <div class="rh"><span class="no">${esc(o.no)}</span><span class="status ${st.cls}">${st.t}</span><span class="time">${fmtTime(o.ts)}</span></div>
+      ${o.items.map(e => `<div class="rline"><span class="rname">${esc(e.emoji)} ${esc(e.name)}</span><span class="rqty">×${e.n}</span><span>${e.price * e.n}💗</span></div>`).join('')}
+      <div class="rtotal">合计 ${o.total}💗 · ${esc(o.from)}</div>
+      ${o.expect ? `<div class="rnote">⏰ ${esc(o.expect)}</div>` : ''}
+      ${o.note ? `<div class="rnote">📝 ${esc(o.note)}</div>` : ''}
+      <div class="racts">${acts}<button class="btn ghost" data-act="copy" data-id="${esc(o.id)}">📋 复制</button></div>
+    </div>`;
+  }).join('');
+}
+function setOrderStatus(id, status) {
+  const o = orders.find(x => x.id === id); if (!o) return;
+  o.status = status; o.statusTs = Date.now();
+  saveOrders(); renderOrders(); publishStatus(o);
+  if (status === 'done') { burstCenter(); toast('这单完成啦 🎉'); ding(988, .1, .3); }
+  else if (status === 'accepted') toast('已接单，快去准备吧 🙌');
+}
+function copyText(t) {
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = t;
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('已复制 📋'); } catch (e) { toast('复制失败，请手动复制'); }
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('已复制 📋')).catch(fallback);
+  else fallback();
+}
+
+/* ================= 提交订单 ================= */
+function submitOrder() {
+  const es2 = cartEntries(); if (!es2.length) return;
+  const order = sanitizeOrder({
+    id: uid(), no: fmtNo(Date.now()), ts: Date.now(),
+    from: settings.customerName || '神秘客人',
+    items: es2.map(({ it, n }) => ({ id: it.id, emoji: it.emoji, name: it.name, price: it.price, n })),
+    total: cartTotal(),
+    note: (cart.note || '').trim().slice(0, 100),
+    expect: cart.expect || EXPECTS[0],
+    status: 'pending',
+  });
+  orders.unshift(order); saveOrders(); renderOrders();
+  cart = { qty: {}, note: '', expect: cart.expect || EXPECTS[0] };
+  saveCart(); renderCartUI();
+  closeSheets();
+  showSuccess(order);
+  pushOrder(order);
+}
+function showSuccess(o) {
+  $('#okReceipt').innerHTML =
+    `<div class="ok-no">${esc(o.no)} · 客人 ${esc(o.from)}</div>` +
+    o.items.map(e => `<div class="rline"><span class="rname">${esc(e.emoji)} ${esc(e.name)}</span><span class="rqty">×${e.n}</span><span>${e.price * e.n}💗</span></div>`).join('') +
+    `<div class="rtotal">合计 ${o.total}💗</div>` +
+    (o.note ? `<div class="rnote">📝 ${esc(o.note)}</div>` : '');
+  $('#okMask').classList.add('show');
+  burstCenter(); melody();
+}
+
+/* ================= 推送 & 双人同步（ntfy / Bark / Server酱 / Webhook） ================= */
+const ntfyServer = () => (settings.push.ntfy.server || 'https://ntfy.sh').replace(/\/+$/, '');
+function ntfyPost(server, topic, payload) {
+  return fetch(server.replace(/\/+$/, '') + '/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ topic }, payload)),
+  });
+}
+async function syncPublishOrder(order) {
+  const cfg = settings.push.ntfy;
+  if (!cfg.enabled || !cfg.topic) return { ok: true, skipped: true, label: '实时同步' };
+  const err = assertSafeUrl(ntfyServer()); if (err) return { ok: false, label: '实时同步', errMsg: err };
+  try { await ntfyPost(ntfyServer(), cfg.topic, { message: JSON.stringify({ type: 'order', order }), priority: 'min' }); return { ok: true, label: '实时同步' }; }
+  catch (e) { return { ok: false, label: '实时同步', errMsg: '网络错误' }; }
+}
+async function publishToSync(body) {
+  const cfg = settings.push.ntfy;
+  if (!cfg.enabled || !cfg.topic) return { ok: true, skipped: true, label: '实时同步' };
+  const err = assertSafeUrl(ntfyServer()); if (err) return { ok: false, label: '实时同步', errMsg: err };
+  try { await ntfyPost(ntfyServer(), cfg.topic, { message: body, priority: 'min' }); return { ok: true, label: '实时同步' }; }
+  catch (e) { return { ok: false, label: '实时同步', errMsg: '网络错误' }; }
+}
+function publishStatus(o) {
+  if (settings.push.ntfy.enabled && settings.push.ntfy.topic) {
+    publishToSync(JSON.stringify({ type: 'status', id: o.id, status: o.status, ts: o.statusTs }));
+  }
+}
+async function pushNotifyToNtfy(title, body, cfg) {
+  cfg = cfg || settings.push.ntfy;
+  if (!cfg.enabled || !cfg.topic) return { ok: true, skipped: true, label: 'ntfy推送' };
+  const err = assertSafeUrl(ntfyServer()); if (err) return { ok: false, label: 'ntfy推送', errMsg: err };
+  try { const r = await ntfyPost(ntfyServer(), cfg.topic + '-push', { title, message: body, tags: ['heart', 'sparkles'], priority: 'high' }); return { ok: r.ok, label: 'ntfy推送' }; }
+  catch (e) { return { ok: false, label: 'ntfy推送', errMsg: '网络错误' }; }
+}
+function extractBarkKey(raw) {
+  const s = str(raw);
+  if (/^https?:\/\//i.test(s)) {
+    try { const u = new URL(s); const seg = u.pathname.split('/').filter(Boolean); return seg.length ? seg[0] : ''; }
+    catch (e) { return ''; }
+  }
+  return s.replace(/^\/+|\/+$/g, '').split('/')[0];
+}
+async function sendBark(title, body, rawOverride) {
+  const raw = str(rawOverride ?? settings.push.bark);
+  if (!raw) return { ok: true, skipped: true, label: 'Bark' };
+  const key = extractBarkKey(raw);
+  if (!key) return { ok: false, label: 'Bark', errMsg: 'Key 为空' };
+  const url = `https://api.day.app/${encodeURIComponent(key)}/${encodeURIComponent(title)}/${encodeURIComponent(body)}?group=CoupleShop`;
+  const err = assertSafeUrl(url); if (err) return { ok: false, label: 'Bark', errMsg: err };
+  try { await fetch(url, { mode: 'no-cors' }); return { ok: true, label: 'Bark' }; }
+  catch (e) { return { ok: false, label: 'Bark', errMsg: '网络错误' }; }
+}
+async function sendServerChan(title, body, keyOverride) {
+  const key = str(keyOverride ?? settings.push.serverchan);
+  if (!key) return { ok: true, skipped: true, label: 'Server酱' };
+  const url = `https://sctapi.ftqq.com/${encodeURIComponent(key)}.send?title=${encodeURIComponent(title)}&desp=${encodeURIComponent(body)}`;
+  const err = assertSafeUrl(url); if (err) return { ok: false, label: 'Server酱', errMsg: err };
+  try { await fetch(url, { mode: 'no-cors' }); return { ok: true, label: 'Server酱' }; }
+  catch (e) { return { ok: false, label: 'Server酱', errMsg: '网络错误' }; }
+}
+async function sendHook(title, body, order, rawOverride) {
+  const raw = str(rawOverride ?? settings.push.hook);
+  if (!raw) return { ok: true, skipped: true, label: 'Webhook' };
+  let url = raw, opts;
+  if (/\{message\}|\{title\}/.test(raw)) {
+    url = raw.replace('{title}', encodeURIComponent(title)).replace('{message}', encodeURIComponent(body));
+    opts = { mode: 'no-cors' };
+  } else {
+    opts = { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title, message: body, order }) };
+  }
+  const err = assertSafeUrl(url); if (err) return { ok: false, label: 'Webhook', errMsg: err };
+  try { await fetch(url, opts); return { ok: true, label: 'Webhook' }; }
+  catch (e) { return { ok: false, label: 'Webhook', errMsg: '网络错误' }; }
+}
+function requestNotifyPermission() {
+  try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {}
+}
+function localNotify(title, body) {
+  try {
+    if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+      new Notification(title, { body });
+    }
+  } catch (e) {}
+}
+async function pushOrder(order) {
+  const title = `💌 ${settings.shopName}·新订单`;
+  const body = orderSummaryText(order);
+  requestNotifyPermission();
+  const results = await Promise.allSettled([
+    syncPublishOrder(order), pushNotifyToNtfy(title, body), sendBark(title, body), sendServerChan(title, body), sendHook(title, body, order),
+  ]);
+  const fails = results.map(r => (r.status === 'fulfilled' ? r.value : { ok: false, label: '推送' })).filter(r => r && r.ok === false);
+  localNotify(title, body);
+  if (fails.length) toast(`已下单！${fails.length} 路推送没发出去（${fails.map(f => f.label).join('、')}）`);
+}
+
+/* ---- 订阅实时同步（SSE） ---- */
+function setSyncUI(state) {
+  const map = { off: ['单机模式', ''], connecting: ['连接中…', 'retry'], on: ['实时同步中', 'on'], retry: ['同步重连中', 'retry'] };
+  const [t, c] = map[state] || map.off;
+  $('#syncText').textContent = t;
+  $('#syncDot').className = 'sdot ' + c;
+}
+function handleSync(text) {
+  let m; try { m = JSON.parse(text); } catch (e) { return; }
+  if (!m || typeof m !== 'object') return;
+  if (m.type === 'order') {
+    const o = sanitizeOrder(m.order);
+    if (o && !orders.some(x => x.id === o.id)) {
+      orders.unshift(o); saveOrders(); renderOrders();
+      toast('💌 收到新订单！'); melody(); burstCenter();
+      localNotify('💌 收到新订单', `${o.from} 点了 ${o.total}💗 的单`);
+    }
+  } else if (m.type === 'status' && STATUS[m.status]) {
+    const o = orders.find(x => x.id === m.id);
+    if (o && (o.statusTs || 0) < (Number(m.ts) || 0)) {
+      o.status = m.status; o.statusTs = Number(m.ts) || Date.now();
+      saveOrders(); renderOrders();
+      toast(`${o.no} ${STATUS[m.status].t}啦 ${m.status === 'accepted' ? '🙌' : m.status === 'done' ? '🎉' : ''}`);
+    }
+  }
+}
+function connectSync() {
+  if (es) { es.close(); es = null; }
+  const cfg = settings.push.ntfy;
+  if (!cfg.enabled || !cfg.topic) { setSyncUI('off'); return; }
+  const err = assertSafeUrl(ntfyServer());
+  if (err) { setSyncUI('off'); return; }
+  setSyncUI('connecting');
+  try {
+    es = new EventSource(`${ntfyServer()}/${encodeURIComponent(cfg.topic)}/sse`);
+    es.onopen = () => setSyncUI('on');
+    es.onerror = () => setSyncUI('retry');
+    es.addEventListener('message', ev => {
+      let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
+      if (d && d.event === 'message' && typeof d.message === 'string') handleSync(d.message);
+    });
+  } catch (e) { setSyncUI('off'); }
+}
+
+/* ================= 设置面板 ================= */
+const field = (id, label, val, ph) =>
+  `<div class="field"><label>${label}</label><input type="text" id="${id}" value="${esc(val || '')}" placeholder="${esc(ph || '')}"></div>`;
+
+function openSettings() {
+  draft = JSON.parse(JSON.stringify(settings));
+  renderSettings();
+  openSheet($('#settingsSheet'));
+}
+function renderSettings() {
+  $('#settingsBody').innerHTML = `
+    <div class="card-box">
+      <h3>🏪 店铺信息</h3>
+      ${field('shopName', '店铺名称', draft.shopName, '心动点单小铺')}
+      ${field('ownerName', '店主名字（随时可改）', draft.ownerName, '宝贝老板')}
+      ${field('customerName', '客人称呼（TA 的名字/昵称）', draft.customerName, '小甜心')}
+      ${field('tagline', '开店标语', draft.tagline, '本店只接待一位特别的客人')}
+    </div>
+    <div class="card-box">
+      <h3>🧾 菜单管理</h3>
+      <p class="hint" style="margin:0 0 4px">直接改图标、名字和价格；点 ✕ 删除，点「＋ 上新」添加。</p>
+      <div id="menuEditor"></div>
+    </div>
+    <div class="card-box">
+      <h3>🔄 双人实时同步
+        <label class="switch" style="margin-left:auto"><input type="checkbox" id="ntfyOn" ${draft.push.ntfy.enabled ? 'checked' : ''}><span class="slider"></span></label>
+      </h3>
+      <div class="field"><label>房间码（两边填同一个就能互发订单）</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="ntfyTopic" value="${esc(draft.push.ntfy.topic)}" placeholder="例如 cshop-x7k2m9qp" autocomplete="off">
+          <button class="btn ghost" id="genTopic" style="flex:none">掷一个</button>
+        </div>
+        <p class="hint">开启后订单和接单状态实时互相同步，不用注册任何账号。房间码请像密码一样保管。手机装 ntfy App 后，订阅主题「房间码-push」即可离线收推送。</p>
+      </div>
+      <div class="field"><label>同步服务器</label>
+        <input type="text" id="ntfyServer" value="${esc(draft.push.ntfy.server)}" placeholder="https://ntfy.sh">
+        <p class="hint">默认官方服务器，仅支持公网 http/https 地址。</p>
+      </div>
+    </div>
+    <div class="card-box">
+      <h3>📲 手机推送（可选增强）</h3>
+      <div class="field"><label>Bark（iOS）Key</label>
+        <input type="text" id="barkKey" value="${esc(draft.push.bark)}" placeholder="粘贴 Bark App 里的那串 Key">
+        <p class="hint">对方 iPhone 装 Bark 后，把 Key 粘到这里，下单就会推送到 TA 的手机。</p>
+      </div>
+      <div class="field"><label>Server酱 SendKey（微信推送）</label>
+        <input type="text" id="scKey" value="${esc(draft.push.serverchan)}" placeholder="sct.ftqq.com 免费申请">
+      </div>
+      <div class="field"><label>自定义 Webhook</label>
+        <input type="text" id="hookUrl" value="${esc(draft.push.hook)}" placeholder="https://…（含 {message} 时按 GET 模板发送）">
+      </div>
+      <button class="btn ghost block" id="testPush">🔔 发送测试推送</button>
+    </div>
+    <div class="card-box">
+      <h3>💾 数据</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost" id="expCfg">📤 导出配置</button>
+        <button class="btn ghost" id="impCfg">📥 导入配置</button>
+        <button class="btn gray" id="resetMenu">♻️ 恢复默认菜单</button>
+        <button class="btn gray" id="clearOrders">🧹 清空订单</button>
+      </div>
+      <input type="file" id="impFile" accept=".json,application/json" hidden>
+      <p class="hint">所有数据只保存在本设备浏览器里；换手机前先「导出配置」。</p>
+    </div>
+    <button class="btn pri block" id="saveSettings" style="padding:14px;font-size:15px">保存设置 💗</button>`;
+  renderMenuEditor();
+  wireSettings();
+}
+function renderMenuEditor() {
+  $('#menuEditor').innerHTML = CATS.map(c => `
+    <div class="mgroup">${c.emoji} ${c.title}</div>
+    ${(draft.menu[c.key] || []).map((it, i) => `
+      <div class="mrow" data-cat="${c.key}" data-i="${i}">
+        <input class="e" data-f="emoji" value="${esc(it.emoji)}" maxlength="8" aria-label="图标">
+        <input class="n" data-f="name" value="${esc(it.name)}" maxlength="20" placeholder="名称" aria-label="名称">
+        <input class="p" data-f="price" type="number" min="0" max="999" value="${it.price}" aria-label="价格">
+        <button class="del" data-del="1" aria-label="删除">✕</button>
+      </div>`).join('')}
+    <button class="btn ghost" data-newcat="${c.key}" style="padding:7px 12px;font-size:12.5px;margin-bottom:10px">＋ 上新</button>`).join('');
+}
+function bindMenuEditor() {
+  const me = $('#menuEditor');
+  me.addEventListener('input', e => {
+    const row = e.target.closest('.mrow'); if (!row) return;
+    const it = draft.menu[row.dataset.cat][+row.dataset.i];
+    if (!it) return;
+    if (e.target.dataset.f === 'price') it.price = clampInt(e.target.value, 0, 999);
+    else it[e.target.dataset.f] = e.target.value;
+  });
+  me.addEventListener('click', e => {
+    const del = e.target.closest('[data-del]');
+    if (del) { const row = del.closest('.mrow'); draft.menu[row.dataset.cat].splice(+row.dataset.i, 1); renderMenuEditor(); return; }
+    const nw = e.target.closest('[data-newcat]');
+    if (nw) { draft.menu[nw.dataset.newcat].push({ id: uid(), emoji: '✨', name: '神秘新品', desc: '店主还没想好', price: 1 }); renderMenuEditor(); }
+  });
+}
+function wireSettings() {
+  ['shopName', 'ownerName', 'customerName', 'tagline'].forEach(id => {
+    $('#' + id).addEventListener('input', e => { draft[id] = e.target.value; });
+  });
+  $('#ntfyOn').addEventListener('change', e => { draft.push.ntfy.enabled = e.target.checked; });
+  $('#ntfyTopic').addEventListener('input', e => { draft.push.ntfy.topic = e.target.value.trim(); });
+  $('#ntfyServer').addEventListener('input', e => { draft.push.ntfy.server = e.target.value.trim(); });
+  $('#barkKey').addEventListener('input', e => { draft.push.bark = e.target.value.trim(); });
+  $('#scKey').addEventListener('input', e => { draft.push.serverchan = e.target.value.trim(); });
+  $('#hookUrl').addEventListener('input', e => { draft.push.hook = e.target.value.trim(); });
+  $('#genTopic').addEventListener('click', () => {
+    const t = 'cshop-' + Math.random().toString(36).slice(2, 12);
+    draft.push.ntfy.topic = t; $('#ntfyTopic').value = t;
+    draft.push.ntfy.enabled = true; $('#ntfyOn').checked = true;
+  });
+  $('#testPush').addEventListener('click', testPush);
+  $('#expCfg').addEventListener('click', () => {
+    const data = JSON.stringify({ app: 'couple-order-shop', version: 1, exportedAt: new Date().toISOString(), settings }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${settings.shopName}-配置.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+  $('#impCfg').addEventListener('click', () => $('#impFile').click());
+  $('#impFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const j = JSON.parse(r.result);
+        if (!j.settings) throw new Error('bad');
+        settings = mergeSettings(j.settings);
+        saveJSON(LS.settings, settings);
+        draft = JSON.parse(JSON.stringify(settings));
+        renderSettings(); renderHead(); renderTabs(); renderMenu(); renderCartUI(); renderOrders(); connectSync();
+        toast('配置导入成功 🎉');
+      } catch (err) { toast('导入失败：文件格式不对'); }
+    };
+    r.readAsText(f);
+    e.target.value = '';
+  });
+  $('#resetMenu').addEventListener('click', () => {
+    draft.menu = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.menu));
+    renderMenuEditor(); toast('菜单已恢复默认（记得点保存）');
+  });
+  $('#clearOrders').addEventListener('click', () => {
+    if (confirm('确定清空所有订单记录吗？')) { orders = []; saveOrders(); renderOrders(); toast('订单已清空'); }
+  });
+  $('#saveSettings').addEventListener('click', saveSettings);
+  bindMenuEditor();
+}
+function saveSettings() {
+  draft.shopName = str(draft.shopName).slice(0, 30) || '心动点单小铺';
+  draft.ownerName = str(draft.ownerName).slice(0, 20) || '宝贝老板';
+  draft.customerName = str(draft.customerName).slice(0, 20) || '小甜心';
+  draft.tagline = str(draft.tagline).slice(0, 40);
+  if (draft.push.ntfy.server) {
+    const err = assertSafeUrl(draft.push.ntfy.server);
+    if (err) { toast('同步服务器：' + err); return; }
+  } else draft.push.ntfy.server = 'https://ntfy.sh';
+  if (draft.push.ntfy.topic && !/^[A-Za-z0-9_-]{4,64}$/.test(draft.push.ntfy.topic)) {
+    toast('房间码只能是字母数字-_（4-64 位）'); return;
+  }
+  if (draft.push.hook) {
+    const err = assertSafeUrl(draft.push.hook.replace('{title}', 't').replace('{message}', 'm'));
+    if (err) { toast('Webhook：' + err); return; }
+  }
+  for (const c of CATS) {
+    draft.menu[c.key] = (draft.menu[c.key] || []).filter(it => str(it.name)).map(it => ({
+      id: str(it.id).slice(0, 40) || uid(),
+      emoji: str(it.emoji).slice(0, 8) || '💗',
+      name: str(it.name).slice(0, 20),
+      desc: str(it.desc).slice(0, 40),
+      price: clampInt(it.price, 0, 999),
+    }));
+  }
+  Object.keys(cart.qty).forEach(id => { if (!itemIn(draft, id)) delete cart.qty[id]; });
+  settings = draft; draft = null;
+  saveJSON(LS.settings, settings); saveCart();
+  renderHead(); renderTabs(); renderMenu(); renderCartUI(); renderOrders(); connectSync();
+  closeSheets(); toast('设置已保存 💗');
+  localStorage.setItem(LS.tip, '1');
+}
+async function testPush() {
+  toast('发送测试推送…');
+  const title = '🔔 测试推送';
+  const body = `这是「${draft.shopName || '点单小铺'}」的测试消息～收到就说明配置成功！`;
+  const rs = await Promise.allSettled([
+    pushNotifyToNtfy(title, body, draft.push.ntfy),
+    sendBark(title, body, draft.push.bark),
+    sendServerChan(title, body, draft.push.serverchan),
+    sendHook(title, body, null, draft.push.hook),
+  ]);
+  const vals = rs.map(r => r.value || { ok: false, label: '推送' });
+  const active = vals.filter(v => !v.skipped);
+  if (!active.length) { toast('还没有配置任何推送方式哦'); return; }
+  const fails = active.filter(v => !v.ok);
+  toast(fails.length ? `${fails.map(f => f.label).join('、')}发送失败（${fails.map(f => f.errMsg || '未知').join('、')}）` : `测试推送已发出（${active.map(v => v.label).join('、')}），去看看收到没～`);
+}
+
+/* ================= 事件绑定 ================= */
+document.addEventListener('click', e => {
+  const act = e.target.closest('[data-act]');
+  if (act) {
+    const id = act.dataset.id;
+    if (act.dataset.act === 'accept') setOrderStatus(id, 'accepted');
+    else if (act.dataset.act === 'decline') setOrderStatus(id, 'declined');
+    else if (act.dataset.act === 'done') setOrderStatus(id, 'done');
+    else if (act.dataset.act === 'del') { orders = orders.filter(x => x.id !== id); saveOrders(); renderOrders(); }
+    else if (act.dataset.act === 'copy') { const o = orders.find(x => x.id === id); if (o) copyText(orderSummaryText(o)); }
+    return;
+  }
+  const add = e.target.closest('[data-add]');
+  if (add) { addToCart(add.dataset.add, e.clientX, e.clientY); return; }
+  const card = e.target.closest('.item[data-id]');
+  if (card) { addToCart(card.dataset.id, e.clientX, e.clientY); return; }
+  const tab = e.target.closest('[data-cat]');
+  if (tab) { activeCat = tab.dataset.cat; renderTabs(); renderMenu(); return; }
+  const inc = e.target.closest('[data-inc]');
+  if (inc) { addToCart(inc.dataset.inc); return; }
+  const dec = e.target.closest('[data-dec]');
+  if (dec) { removeFromCart(dec.dataset.dec); return; }
+  const ech = e.target.closest('[data-expect]');
+  if (ech) { cart.expect = ech.dataset.expect; saveCart(); renderExpectChips(); return; }
+});
+$('#mask').addEventListener('click', closeSheets);
+$$('.sheet [data-close]').forEach(b => b.addEventListener('click', closeSheets));
+$('#goBtn').addEventListener('click', () => { renderCartRows(); openSheet($('#cartSheet')); });
+$('#submitBtn').addEventListener('click', submitOrder);
+$('#noteInput').addEventListener('input', e => { cart.note = e.target.value; saveCart(); });
+$('#ordersBtn').addEventListener('click', () => { renderOrders(); openSheet($('#ordersSheet')); });
+$('#settingsBtn').addEventListener('click', openSettings);
+$('#okMore').addEventListener('click', () => $('#okMask').classList.remove('show'));
+$('#okOrders').addEventListener('click', () => { $('#okMask').classList.remove('show'); renderOrders(); openSheet($('#ordersSheet')); });
+$('#tipClose').addEventListener('click', () => { $('#tip').style.display = 'none'; localStorage.setItem(LS.tip, '1'); });
+addEventListener('storage', e => {
+  if (e.key === LS.orders) { orders = loadJSON(LS.orders, []); if (!Array.isArray(orders)) orders = []; renderOrders(); }
+});
+
+/* ================= 启动 ================= */
+if (!localStorage.getItem(LS.tip)) $('#tip').style.display = 'flex';
+renderHead(); renderTabs(); renderMenu(); renderCartUI(); renderOrders();
+connectSync();
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>
